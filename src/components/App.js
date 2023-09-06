@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { Container } from 'react-bootstrap'
-import { ethers } from 'ethers'
+import { useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
+import { ethers } from 'ethers';
 
 // Components
 import Navigation from './Navigation';
@@ -9,66 +9,91 @@ import Proposals from './Proposals';
 import Loading from './Loading';
 
 // ABIs: Import your contract ABIs here
-import DAO_ABI from '../abis/DAO.json'
+import DAO_ABI from '../abis/DAO.json';
 
 // Config: Import your network config here
 import config from '../config.json';
 
 function App() {
-  const [provider, setProvider] = useState(null)  
-  const [account, setAccount] = useState(null)
-  const [dao, setDao] = useState(null)
-  const [treasuryBalance, setTreasuryBalance] = useState(0)
+  const [provider, setProvider] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [dao, setDao] = useState(null);
+  const [treasuryBalance, setTreasuryBalance] = useState(0);
 
-  const [proposals, setProposals] = useState(null)
-  const [quorum, setQuorum] = useState(null)
+  // Shows recipient balance on the front end
+  const [recipientBalance, setRecipientBalance] = useState(0);
 
-  const [isLoading, setIsLoading] = useState(true)
+  const [proposals, setProposals] = useState(null);
+  const [quorum, setQuorum] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Define the fetchRecipientBalance function separately
+  const fetchRecipientBalance = async (recipientAddress) => {
+    try {
+      // Create an instance of the ethers.js provider
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      // Fetch the balance of the recipient's address
+      const balance = await provider.getBalance(recipientAddress);
+
+      // Convert the balance to Ether (ETH) and update the state
+      const etherBalance = ethers.utils.formatEther(balance);
+      setRecipientBalance(etherBalance);
+    } catch (error) {
+      console.error('Error fetching recipient balance:', error.message);
+    }
+  };
 
   const loadBlockchainData = async () => {
     // Initiate provider
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    setProvider(provider)
-    
-    // Initiate contracts c
-    console.log(config[31337].dao.address, DAO_ABI, provider)
-    const dao = new ethers.Contract(config[31337].dao.address, DAO_ABI, provider)
-    setDao(dao)
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    setProvider(provider);
+
+    // Initiate contracts
+    console.log(config[31337].dao.address, DAO_ABI, provider);
+    const dao = new ethers.Contract(config[31337].dao.address, DAO_ABI, provider);
+    setDao(dao);
 
     // Fetch treasury balance
-    let treasuryBalance = await provider.getBalance(dao.address)
-    treasuryBalance = ethers.utils.formatUnits(treasuryBalance, 18)
-    setTreasuryBalance(treasuryBalance)
+    let treasuryBalance = await provider.getBalance(dao.address);
+    treasuryBalance = ethers.utils.formatUnits(treasuryBalance, 18);
+    setTreasuryBalance(treasuryBalance);
 
     // Fetch accounts
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-    const account = ethers.utils.getAddress(accounts[0])
-    setAccount(account)
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account = ethers.utils.getAddress(accounts[0]);
+    setAccount(account);
 
     // Fetch proposals count
-    const count = await dao.proposalCount()
-    const items = []
+    const count = await dao.proposalCount();
+    const items = [];
 
-    for(var i = 0; i < count; i++) {
-      const proposal = await dao.proposals(i + 1)
-      items.push(proposal)
+    for (var i = 0; i < count; i++) {
+      const proposal = await dao.proposals(i + 1);
+      items.push(proposal);
     }
 
-    setProposals(items)
+    setProposals(items);
 
     // Fetch quorum
-    setQuorum(await dao.quorum())
+    setQuorum(await dao.quorum());
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    const recipientAddress = '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65';
+    fetchRecipientBalance(recipientAddress);
+  }, []);
 
   useEffect(() => {
     if (isLoading) {
-      loadBlockchainData()
+      loadBlockchainData();
     }
   }, [isLoading]);
 
-  return(
+  return (
     <Container>
       <Navigation account={account} />
 
@@ -78,7 +103,7 @@ function App() {
         <Loading />
       ) : (
         <>
-          <Create 
+          <Create
             provider={provider}
             dao={dao}
             setIsLoading={setIsLoading}
@@ -86,11 +111,12 @@ function App() {
 
           <h3 className=''>Easy made governance</h3>
           <h3 className=''>It's simple to cast votes and make proposals, so there are no barriers to entry for members.</h3>
-          <hr/>
+          <hr />
 
           <p className='text-center'><strong>Treasury Balance:</strong> {treasuryBalance} ETH</p>
+          <p className="text-center"><strong>Recipient Balance:</strong> {recipientBalance} ETH</p>
 
-          <hr/>
+          <hr />
 
           <Proposals
             provider={provider}
@@ -102,7 +128,7 @@ function App() {
         </>
       )}
     </Container>
-  )
+  );
 }
 
 export default App;
