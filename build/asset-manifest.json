@@ -1,16 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.24b68c36.css",
-    "main.js": "/static/js/main.21d6348c.js",
+    "main.css": "/static/css/main.62049a16.css",
+    "main.js": "/static/js/main.cd4e8230.js",
     "static/js/787.5d757b1e.chunk.js": "/static/js/787.5d757b1e.chunk.js",
+    "static/media/kalina-bg.jpg": "/static/media/kalina-bg.c18028df97ab29a42404.jpg",
     "static/media/logo.png": "/static/media/logo.5cfc8d20903643fb83a8.png",
     "index.html": "/index.html",
-    "main.24b68c36.css.map": "/static/css/main.24b68c36.css.map",
-    "main.21d6348c.js.map": "/static/js/main.21d6348c.js.map",
+    "main.62049a16.css.map": "/static/css/main.62049a16.css.map",
+    "main.cd4e8230.js.map": "/static/js/main.cd4e8230.js.map",
     "787.5d757b1e.chunk.js.map": "/static/js/787.5d757b1e.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.24b68c36.css",
-    "static/js/main.21d6348c.js"
+    "static/css/main.62049a16.css",
+    "static/js/main.cd4e8230.js"
   ]
 }
